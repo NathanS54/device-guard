@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Device Guard</title>
+    <script type="module" crossorigin src="./assets/index-D7ibcTGS.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DnADA5Q6.css">
+  </head>
+  <body>
+    <main>
+      <header class="app-header">
+        <div>
+          <h1>Device Guard</h1>
+          <p class="tagline">Watches your laptop while you're away and records anyone it doesn't know.</p>
+        </div>
+        <p id="protection-status" class="protection-status" role="status" aria-live="polite">Starting…</p>
+      </header>
+
+      <div class="camera" id="camera-frame">
+        <video id="camera-video" autoplay muted playsinline></video>
+        <canvas id="face-overlay"></canvas>
+        <span id="movement-badge" class="movement-badge" role="status" aria-live="polite" hidden></span>
+        <span id="fps-readout" class="fps-readout" hidden></span>
+      </div>
+
+      <p id="status" class="status" role="status" aria-live="polite">Loading face models…</p>
+
+      <nav class="tabs" role="tablist" aria-label="Device Guard sections">
+        <button id="tab-guard" class="tab" type="button" role="tab" aria-controls="panel-guard" data-tab="guard">
+          Guard
+        </button>
+        <button
+          id="tab-recordings"
+          class="tab"
+          type="button"
+          role="tab"
+          aria-controls="panel-recordings"
+          data-tab="recordings"
+        >
+          Recordings
+        </button>
+        <button id="tab-people" class="tab" type="button" role="tab" aria-controls="panel-people" data-tab="people">
+          People
+        </button>
+        <button
+          id="tab-settings"
+          class="tab"
+          type="button"
+          role="tab"
+          aria-controls="panel-settings"
+          data-tab="settings"
+        >
+          Settings
+        </button>
+      </nav>
+
+      <section id="panel-guard" class="panel guard" role="tabpanel" aria-labelledby="tab-guard" data-panel="guard">
+        <p class="tab-explainer">
+          Arm the guard before you step away. If someone you don't know moves the laptop, it quietly saves a
+          recording. It turns itself off when it sees your face.
+        </p>
+        <div class="panel-header">
+          <h2>Guard</h2>
+          <button id="guard-button" type="button" disabled>Arm guard</button>
+        </div>
+        <p id="guard-status" class="hint" role="status" aria-live="polite">Starting…</p>
+        <p id="guard-event" class="guard-event" role="status" aria-live="polite" hidden></p>
+      </section>
+
+      <section
+        id="panel-recordings"
+        class="panel recording"
+        role="tabpanel"
+        aria-labelledby="tab-recordings"
+        data-panel="recordings"
+        hidden
+      >
+        <p class="tab-explainer">
+          What the camera saved. Alerts are saved automatically; you can also keep the last few minutes yourself.
+          Recordings stay on this laptop.
+        </p>
+        <div class="panel-header">
+          <h2>Saved recordings</h2>
+          <button id="save-clip-button" type="button" disabled>Save recent minutes</button>
+        </div>
+        <p id="recording-status" class="status" role="status" aria-live="polite"></p>
+
+        <h3>Alerts</h3>
+        <ul id="alert-clip-list" class="chunk-list"></ul>
+
+        <h3>Saved by you</h3>
+        <ul id="manual-clip-list" class="chunk-list"></ul>
+
+        <p id="clip-player-caption" class="hint" hidden></p>
+        <video id="clip-player" class="clip-player" controls playsinline hidden></video>
+
+        <details class="live-recording">
+          <summary>
+            <span id="recording-indicator" class="recording-indicator" hidden>●</span> Recording now (not saved
+            yet)
+          </summary>
+          <p id="recording-summary" class="hint">Recording starts when the camera does.</p>
+          <ol id="recent-chunk-list" class="chunk-list"></ol>
+        </details>
+      </section>
+
+      <section
+        id="panel-people"
+        class="panel"
+        role="tabpanel"
+        aria-labelledby="tab-people"
+        data-panel="people"
+        hidden
+      >
+        <p class="tab-explainer">
+          Who the camera knows. You can turn the guard off just by being seen. Trusted people can use the laptop
+          without setting it off, but can't turn the guard off.
+        </p>
+
+        <h2>You</h2>
+        <p class="hint">Enroll from a few angles so the camera recognizes you. Re-enroll if it starts missing you.</p>
+        <div class="controls">
+          <button id="enroll-button" type="button" disabled>Enroll my face</button>
+          <button id="forget-button" type="button" class="secondary" disabled>Forget my face</button>
+        </div>
+
+        <h2>Trusted people</h2>
+        <ul id="trusted-list" class="chunk-list"></ul>
+        <form id="add-trusted-form" class="add-trusted">
+          <label for="trusted-name-input">Their name</label>
+          <div class="add-trusted-row">
+            <input id="trusted-name-input" type="text" maxlength="30" autocomplete="off" placeholder="e.g. Advi" />
+            <button id="add-trusted-button" type="submit" disabled>Enroll their face</button>
+          </div>
+          <p class="hint">Have them sit alone in front of the camera and follow the prompts above.</p>
+        </form>
+        <p id="people-status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section
+        id="panel-settings"
+        class="panel"
+        role="tabpanel"
+        aria-labelledby="tab-settings"
+        data-panel="settings"
+        hidden
+      >
+        <p class="tab-explainer">How the camera looks for faces. Most people never need to change this.</p>
+        <label class="detector-setting" for="detector-select">Detection range</label>
+        <select id="detector-select" disabled>
+          <option value="fast">Fast (short range)</option>
+          <option value="balanced" selected>Balanced</option>
+          <option value="long-range">Long range (slower)</option>
+        </select>
+        <p class="hint">
+          Longer range spots faces farther away but checks fewer frames per second (shown in the camera's corner).
+        </p>
+        <h2>About</h2>
+        <button id="show-welcome" type="button" class="secondary">How Device Guard works</button>
+
+        <h2>Your data</h2>
+        <p class="privacy-note">
+          Everything runs in this browser. Your face data and recordings are stored only on this device.
+        </p>
+        <button id="delete-all-button" type="button" class="danger">Delete all my data</button>
+        <p id="delete-all-status" class="status" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <div
+      id="welcome-screen"
+      class="welcome-screen"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="welcome-title"
+      hidden
+    >
+      <div class="welcome-content">
+        <h2 id="welcome-title">Welcome to Device Guard</h2>
+        <p>Device Guard watches your laptop through its camera while you're away.</p>
+        <ol class="welcome-steps">
+          <li><strong>Enroll your face</strong> so it knows you. Add trusted people, like a roommate, if you want.</li>
+          <li><strong>Arm the guard</strong> before you step away.</li>
+          <li>
+            If someone it doesn't know moves your laptop, it <strong>quietly saves a recording</strong>. It turns
+            off when it sees you again.
+          </li>
+        </ol>
+        <h3>What it needs</h3>
+        <ul>
+          <li>Chrome or Edge on a laptop with a camera.</li>
+          <li>This page open and the lid up. It can't watch while the laptop is closed or asleep.</li>
+        </ul>
+        <h3>Use it fairly</h3>
+        <ul>
+          <li>It records video (no sound). Don't point it at places where people expect privacy.</li>
+          <li>Ask friends before you add their faces.</li>
+          <li>Your face and recordings stay on this laptop. You can delete them anytime in Settings.</li>
+        </ul>
+        <p id="welcome-problem" class="status error" hidden></p>
+        <button id="welcome-start" type="button">Get started</button>
+      </div>
+    </div>
+
+    <div id="warning-screen" class="warning-screen" role="alertdialog" aria-labelledby="warning-title" hidden>
+      <div class="warning-content">
+        <h2 id="warning-title">This laptop is protected</h2>
+        <p>You are being recorded, and the owner can track this laptop's location.</p>
+        <p>Please put it back where you found it.</p>
+        <p class="warning-owner-hint">Owner: look at the camera to unlock.</p>
+      </div>
+    </div>
+
+  </body>
+</html>
