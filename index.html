@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Device Guard</title>
-    <script type="module" crossorigin src="./assets/index-DPFVdG_P.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-DnADA5Q6.css">
+    <script type="module" crossorigin src="./assets/index-CkChQQgZ.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BsnOcNLG.css">
   </head>
   <body>
     <main>
@@ -25,6 +25,7 @@
       </div>
 
       <p id="status" class="status" role="status" aria-live="polite">Loading face models…</p>
+      <button id="cancel-enrollment-button" type="button" class="secondary" hidden>Cancel enrolling</button>
 
       <nav class="tabs" role="tablist" aria-label="Device Guard sections">
         <button id="tab-guard" class="tab" type="button" role="tab" aria-controls="panel-guard" data-tab="guard">
@@ -43,6 +44,9 @@
         <button id="tab-people" class="tab" type="button" role="tab" aria-controls="panel-people" data-tab="people">
           People
         </button>
+        <button id="tab-account" class="tab" type="button" role="tab" aria-controls="panel-account" data-tab="account">
+          Account
+        </button>
         <button
           id="tab-settings"
           class="tab"
@@ -60,12 +64,36 @@
           Arm the guard before you step away. If someone you don't know moves the laptop, it quietly saves a
           recording. It turns itself off when it sees your face.
         </p>
+        <div id="setup-checklist" class="setup-checklist" hidden>
+          <h2>Getting started</h2>
+          <ol id="setup-steps"></ol>
+        </div>
         <div class="panel-header">
           <h2>Guard</h2>
           <button id="guard-button" type="button" disabled>Arm guard</button>
         </div>
         <p id="guard-status" class="hint" role="status" aria-live="polite">Starting…</p>
         <p id="guard-event" class="guard-event" role="status" aria-live="polite" hidden></p>
+
+        <div class="alarm-setting">
+          <label class="switch-row" for="alarm-toggle">
+            <input id="alarm-toggle" type="checkbox" role="switch" />
+            Alarm sound
+          </label>
+          <button id="test-alarm-button" type="button" class="secondary">Test sound</button>
+        </div>
+        <p class="hint">
+          Off: the guard stays silent, which is right for libraries and quiet places. On: a siren plays if someone
+          unknown keeps moving the laptop after an alert, until the camera sees your face. Check your volume with
+          Test sound, and disconnect headphones before you leave, or the siren plays in them.
+        </p>
+
+        <h2>Event log</h2>
+        <p class="hint">What the guard did since this page opened, newest first.</p>
+        <h3>Alerts</h3>
+        <ul id="event-log-alerts" class="chunk-list event-log"></ul>
+        <h3>All events</h3>
+        <ul id="event-log-all" class="chunk-list event-log"></ul>
       </section>
 
       <section
@@ -78,8 +106,20 @@
       >
         <p class="tab-explainer">
           What the camera saved. Alerts are saved automatically; you can also keep the last few minutes yourself.
-          Recordings stay on this laptop.
         </p>
+        <details class="where-recordings">
+          <summary>Where are my recordings?</summary>
+          <p>
+            Saved recordings live <strong>inside this browser</strong> on this laptop, not as files in a folder, so
+            you won't find them in File Explorer. They stay until you delete them.
+          </p>
+          <p>
+            To get a video file, press <strong>Download</strong> on a recording. It goes to your
+            <strong>Downloads</strong> folder, wherever Chrome saves downloads. Press <kbd>Ctrl</kbd>+<kbd>J</kbd>
+            to see Chrome's downloads list.
+          </p>
+          <p id="storage-use" hidden></p>
+        </details>
         <div class="panel-header">
           <h2>Saved recordings</h2>
           <button id="save-clip-button" type="button" disabled>Save recent minutes</button>
@@ -139,6 +179,74 @@
       </section>
 
       <section
+        id="panel-account"
+        class="panel"
+        role="tabpanel"
+        aria-labelledby="tab-account"
+        data-panel="account"
+        hidden
+      >
+        <p class="tab-explainer">
+          Sign in to see your laptop's alerts on your phone: use the same email on both. Alert videos are locked
+          with a passphrase only your own devices know. You don't need an account to use the guard.
+        </p>
+        <p id="phone-hint" class="hint" hidden>
+          On iPhone, tap <strong>Share → Add to Home Screen</strong> to open Device Guard like an app.
+          <a id="use-as-guard-link" href="?view=guard">Use this device as a guard instead</a>
+        </p>
+
+        <div id="signed-out-view">
+          <h2>Sign in</h2>
+          <form id="email-form" class="stacked-form" novalidate>
+            <label for="email-input">Email</label>
+            <div class="form-row">
+              <input id="email-input" type="email" autocomplete="email" placeholder="you@example.com" />
+              <button id="email-button" type="submit">Email me a code</button>
+            </div>
+          </form>
+          <form id="code-form" class="stacked-form" novalidate hidden>
+            <label for="code-input">Code from the email</label>
+            <div class="form-row">
+              <input id="code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="10" />
+              <button id="code-button" type="submit">Sign in</button>
+            </div>
+            <button id="change-email-button" type="button" class="link-button">Use a different email</button>
+          </form>
+        </div>
+
+        <div id="signed-in-view" hidden>
+          <div class="panel-header">
+            <p>Signed in as <strong id="account-email"></strong></p>
+            <button id="sign-out-button" type="button" class="secondary">Sign out</button>
+          </div>
+
+          <h2>Video passphrase</h2>
+          <form id="passphrase-form" class="stacked-form">
+            <p class="hint">
+              Use the same passphrase on every device you sign in on. It never leaves your devices, so nobody else
+              can watch your videos, and if you forget it, uploaded videos can't be recovered.
+            </p>
+            <label for="passphrase-input">Passphrase (at least 8 characters)</label>
+            <div class="form-row">
+              <input id="passphrase-input" type="password" autocomplete="new-password" />
+              <button id="passphrase-button" type="submit">Save on this device</button>
+            </div>
+          </form>
+          <p id="passphrase-ready" hidden>✓ This device can lock and unlock your alert videos.</p>
+
+          <div class="panel-header">
+            <h2>Alerts on your account</h2>
+            <button id="refresh-alerts-button" type="button" class="secondary">Refresh</button>
+          </div>
+          <p class="hint">Alerts from your laptop show up here within seconds and are kept for 7 days.</p>
+          <ul id="cloud-alert-list" class="chunk-list"></ul>
+          <video id="cloud-player" class="clip-player" controls playsinline hidden></video>
+        </div>
+
+        <p id="account-status" class="status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section
         id="panel-settings"
         class="panel"
         role="tabpanel"
@@ -149,12 +257,12 @@
         <p class="tab-explainer">How the camera looks for faces. Most people never need to change this.</p>
         <label class="detector-setting" for="detector-select">Detection range</label>
         <select id="detector-select" disabled>
-          <option value="fast">Fast (short range)</option>
-          <option value="balanced" selected>Balanced</option>
-          <option value="long-range">Long range (slower)</option>
+          <option value="standard" selected>Standard (recommended)</option>
+          <option value="fast">Fast (close range only)</option>
         </select>
         <p class="hint">
-          Longer range spots faces farther away but checks fewer frames per second (shown in the camera's corner).
+          Standard finds faces a table's length away and more. Fast only sees faces close to the laptop; try it if
+          the frames-per-second counter in the camera's corner stays low on an older computer.
         </p>
         <h2>About</h2>
         <button id="show-welcome" type="button" class="secondary">How Device Guard works</button>
