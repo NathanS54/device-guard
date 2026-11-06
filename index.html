@@ -4,8 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Device Guard</title>
-    <script type="module" crossorigin src="./assets/index-CkChQQgZ.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-BsnOcNLG.css">
+    <script type="module" crossorigin src="./assets/index-P8JwaAiE.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-W7wSyTde.js">
+    <link rel="stylesheet" crossorigin href="./assets/index-DzWI_jEw.css">
   </head>
   <body>
     <main>
@@ -45,7 +46,7 @@
           People
         </button>
         <button id="tab-account" class="tab" type="button" role="tab" aria-controls="panel-account" data-tab="account">
-          Account
+          Phone
         </button>
         <button
           id="tab-settings"
@@ -187,58 +188,65 @@
         hidden
       >
         <p class="tab-explainer">
-          Sign in to see your laptop's alerts on your phone: use the same email on both. Alert videos are locked
-          with a passphrase only your own devices know. You don't need an account to use the guard.
-        </p>
-        <p id="phone-hint" class="hint" hidden>
-          On iPhone, tap <strong>Share → Add to Home Screen</strong> to open Device Guard like an app.
-          <a id="use-as-guard-link" href="?view=guard">Use this device as a guard instead</a>
+          Get alerts on your phone. Pair it once by scanning a code; there's no account or password. Alert videos
+          are locked on this laptop with a key that only your paired phones get.
         </p>
 
-        <div id="signed-out-view">
-          <h2>Sign in</h2>
-          <form id="email-form" class="stacked-form" novalidate>
-            <label for="email-input">Email</label>
-            <div class="form-row">
-              <input id="email-input" type="email" autocomplete="email" placeholder="you@example.com" />
-              <button id="email-button" type="submit">Email me a code</button>
-            </div>
-          </form>
-          <form id="code-form" class="stacked-form" novalidate hidden>
-            <label for="code-input">Code from the email</label>
-            <div class="form-row">
-              <input id="code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="10" />
-              <button id="code-button" type="submit">Sign in</button>
-            </div>
-            <button id="change-email-button" type="button" class="link-button">Use a different email</button>
-          </form>
+        <div id="laptop-pairing" hidden>
+          <div class="panel-header">
+            <h2>Your phones</h2>
+            <button id="pair-phone-button" type="button">Pair a phone</button>
+          </div>
+          <p id="paired-phones-summary" class="hint">Checking…</p>
+          <div id="pairing-code" class="pairing-code" hidden>
+            <canvas id="pairing-qr" class="pairing-qr" width="240" height="240" aria-label="Pairing QR code"></canvas>
+            <ol class="pairing-steps">
+              <li>On your iPhone, open <strong>nathans54.github.io/device-guard</strong> in Safari.</li>
+              <li>Tap <strong>Share → Add to Home Screen</strong>, then open Device Guard from your home screen.</li>
+              <li>Tap <strong>Scan the laptop's code</strong> and point the camera at this code.</li>
+            </ol>
+            <p class="hint">The code works once, for 10 minutes.</p>
+            <button id="copy-pairing-link" type="button" class="secondary">Copy pairing link instead</button>
+          </div>
+          <button id="unpair-phones-button" type="button" class="secondary" hidden>Unpair all phones</button>
         </div>
 
-        <div id="signed-in-view" hidden>
-          <div class="panel-header">
-            <p>Signed in as <strong id="account-email"></strong></p>
-            <button id="sign-out-button" type="button" class="secondary">Sign out</button>
-          </div>
-
-          <h2>Video passphrase</h2>
-          <form id="passphrase-form" class="stacked-form">
-            <p class="hint">
-              Use the same passphrase on every device you sign in on. It never leaves your devices, so nobody else
-              can watch your videos, and if you forget it, uploaded videos can't be recovered.
+        <div id="phone-pairing" hidden>
+          <div id="phone-unpaired">
+            <p id="home-screen-hint" class="hint" hidden>
+              On iPhone, first tap <strong>Share → Add to Home Screen</strong> and open Device Guard from there.
+              Then pair it, so alerts reach the home-screen app.
             </p>
-            <label for="passphrase-input">Passphrase (at least 8 characters)</label>
-            <div class="form-row">
-              <input id="passphrase-input" type="password" autocomplete="new-password" />
-              <button id="passphrase-button" type="submit">Save on this device</button>
+            <h2>Pair with your laptop</h2>
+            <p class="hint">On your laptop, open Device Guard, go to the Phone tab, and press Pair a phone.</p>
+            <button id="scan-pairing-button" type="button">Scan the laptop's code</button>
+            <div id="scanner" class="scanner" hidden>
+              <video id="scanner-video" muted playsinline></video>
+              <button id="stop-scan-button" type="button" class="secondary">Stop scanning</button>
             </div>
-          </form>
-          <p id="passphrase-ready" hidden>✓ This device can lock and unlock your alert videos.</p>
+            <form id="paste-link-form" class="stacked-form" novalidate>
+              <label for="paste-link-input">Or paste the pairing link</label>
+              <div class="form-row">
+                <input id="paste-link-input" type="url" autocomplete="off" placeholder="https://…#pair=…" />
+                <button id="paste-link-button" type="submit" class="secondary">Pair</button>
+              </div>
+            </form>
+          </div>
+          <div id="phone-paired" hidden>
+            <div class="panel-header">
+              <p>✓ Paired with your laptop</p>
+              <button id="unpair-phone-button" type="button" class="secondary">Unpair</button>
+            </div>
+          </div>
+          <a id="use-as-guard-link" class="use-as-guard" href="?view=guard">Use this device as a guard instead</a>
+        </div>
 
+        <div id="cloud-alerts" hidden>
           <div class="panel-header">
-            <h2>Alerts on your account</h2>
+            <h2 id="cloud-alerts-title">Alerts from your laptop</h2>
             <button id="refresh-alerts-button" type="button" class="secondary">Refresh</button>
           </div>
-          <p class="hint">Alerts from your laptop show up here within seconds and are kept for 7 days.</p>
+          <p class="hint">New alerts show up here within seconds and are kept for 7 days.</p>
           <ul id="cloud-alert-list" class="chunk-list"></ul>
           <video id="cloud-player" class="clip-player" controls playsinline hidden></video>
         </div>
