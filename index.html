@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Device Guard</title>
-    <script type="module" crossorigin src="./assets/index-DZgRhwAk.js"></script>
+    <script type="module" crossorigin src="./assets/index-DKqpShqG.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-W7wSyTde.js">
     <link rel="stylesheet" crossorigin href="./assets/index-1HFpWxg9.css">
   </head>
@@ -277,6 +277,14 @@
           Standard finds faces a table's length away and more. Fast only sees faces close to the laptop; try it if
           the frames-per-second counter in the camera's corner stays low on an older computer.
         </p>
+        <h2>Recognition log</h2>
+        <p class="hint">
+          What face recognition decided and why: how big and how clear each face was, which check stopped it, and how
+          close it was to the people it knows. Numbers and words only, never pictures, and it stays on this laptop.
+        </p>
+        <p id="recognition-log-summary" class="status" role="status" aria-live="polite"></p>
+        <button id="download-recognition-log" type="button" class="secondary">Download recognition log</button>
+
         <h2>About</h2>
         <button id="show-welcome" type="button" class="secondary">How Device Guard works</button>
 
