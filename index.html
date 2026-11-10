@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Device Guard</title>
-    <script type="module" crossorigin src="./assets/index-Y1xd9bw1.js"></script>
+    <script type="module" crossorigin src="./assets/index-DZgRhwAk.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-W7wSyTde.js">
-    <link rel="stylesheet" crossorigin href="./assets/index-DzWI_jEw.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-1HFpWxg9.css">
   </head>
   <body>
     <main>
@@ -15,7 +15,9 @@
           <h1>Device Guard</h1>
           <p class="tagline">Watches your laptop while you're away and records anyone it doesn't know.</p>
         </div>
-        <p id="protection-status" class="protection-status" role="status" aria-live="polite">Starting…</p>
+        <button id="protection-status" class="protection-status" type="button" aria-live="polite" disabled>
+          Starting…
+        </button>
       </header>
 
       <div class="camera" id="camera-frame">
@@ -201,8 +203,11 @@
           <div id="pairing-code" class="pairing-code" hidden>
             <canvas id="pairing-qr" class="pairing-qr" width="240" height="240" aria-label="Pairing QR code"></canvas>
             <ol class="pairing-steps">
-              <li>On your iPhone, open <strong>nathans54.github.io/device-guard</strong> in Safari.</li>
-              <li>Tap <strong>Share → Add to Home Screen</strong>, then open Device Guard from your home screen.</li>
+              <li>On your phone, open <strong>nathans54.github.io/device-guard</strong>.</li>
+              <li>
+                iPhone: tap <strong>Share → Add to Home Screen</strong> in Safari, then open Device Guard from your
+                home screen. Android: you can keep using it in Chrome.
+              </li>
               <li>Tap <strong>Scan the laptop's code</strong> and point the camera at this code.</li>
             </ol>
             <p class="hint">The code works once, for 10 minutes.</p>
@@ -277,7 +282,9 @@
 
         <h2>Your data</h2>
         <p class="privacy-note">
-          Everything runs in this browser. Your face data and recordings are stored only on this device.
+          Face recognition runs in this browser, and your face data and recordings are stored only on this laptop.
+          The one exception: if you pair a phone, alert clips are uploaded locked (only your paired phones have the
+          key, not even the site's owner) and deleted after 7 days.
         </p>
         <button id="delete-all-button" type="button" class="danger">Delete all my data</button>
         <p id="delete-all-status" class="status" role="status" aria-live="polite"></p>
@@ -310,9 +317,15 @@
         </ul>
         <h3>Use it fairly</h3>
         <ul>
-          <li>It records video (no sound). Don't point it at places where people expect privacy.</li>
+          <li>
+            While this page is open, it keeps the last few minutes of video (no sound) and deletes older minutes.
+            Don't point it at places where people expect privacy.
+          </li>
           <li>Ask friends before you add their faces.</li>
-          <li>Your face and recordings stay on this laptop. You can delete them anytime in Settings.</li>
+          <li>
+            Your face and recordings stay on this laptop. If you pair a phone, only alert clips go to it, locked with
+            a key only your phone has, and they're deleted after 7 days. Delete everything anytime in Settings.
+          </li>
         </ul>
         <p id="welcome-problem" class="status error" hidden></p>
         <button id="welcome-start" type="button">Get started</button>
