@@ -4,7 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Device Guard</title>
-    <script type="module" crossorigin src="./assets/index-B6-0apJv.js"></script>
+    <!-- iPhone allows notifications only for home-screen apps that have this file. -->
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <meta name="theme-color" content="#172554" />
+    <script type="module" crossorigin src="./assets/index-DKSuG1Dm.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/rolldown-runtime-W7wSyTde.js">
     <link rel="stylesheet" crossorigin href="./assets/index-1HFpWxg9.css">
   </head>
@@ -242,6 +246,10 @@
               <p>✓ Paired with your laptop</p>
               <button id="unpair-phone-button" type="button" class="secondary">Unpair</button>
             </div>
+            <div id="notifications-setup" hidden>
+              <button id="notifications-button" type="button" hidden>Turn on notifications</button>
+              <p id="notifications-note" class="hint" role="status" aria-live="polite"></p>
+            </div>
           </div>
           <a id="use-as-guard-link" class="use-as-guard" href="?view=guard">Use this device as a guard instead</a>
         </div>
@@ -277,6 +285,14 @@
           Standard finds faces a table's length away and more. Fast only sees faces close to the laptop; try it if
           the frames-per-second counter in the camera's corner stays low on an older computer.
         </p>
+        <label class="switch-row" for="show-match-numbers">
+          <input id="show-match-numbers" type="checkbox" role="switch" />
+          Show match numbers
+        </label>
+        <p class="hint">
+          Adds a number to each face's label: how far that face is from the closest person the camera knows. Lower
+          is a closer match; above 0.50 counts as Unknown.
+        </p>
         <h2>Recognition log</h2>
         <p class="hint">
           What face recognition decided and why: how big and how clear each face was, which check stopped it, and how
@@ -292,7 +308,8 @@
         <p class="privacy-note">
           Face recognition runs in this browser, and your face data and recordings are stored only on this laptop.
           The one exception: if you pair a phone, alert clips are uploaded locked (only your paired phones have the
-          key, not even the site's owner) and deleted after 7 days.
+          key, not even the site's owner) and deleted after 7 days. Device Guard is a student project for a University
+          of Illinois course (CS 124).
         </p>
         <button id="delete-all-button" type="button" class="danger">Delete all my data</button>
         <p id="delete-all-status" class="status" role="status" aria-live="polite"></p>
@@ -333,6 +350,10 @@
           <li>
             Your face and recordings stay on this laptop. If you pair a phone, only alert clips go to it, locked with
             a key only your phone has, and they're deleted after 7 days. Delete everything anytime in Settings.
+          </li>
+          <li>
+            Device Guard is a student project for a University of Illinois course (CS 124). The student who runs it
+            can't see your face data or your videos.
           </li>
         </ul>
         <p id="welcome-problem" class="status error" hidden></p>
